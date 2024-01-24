@@ -6,13 +6,13 @@ import {
     Select,
     TextInput,
 } from 'flowbite-react';
-import { Editor, EditorState } from 'draft-js';
-import 'draft-js/dist/Draft.css';
+// import { Editor, EditorState } from 'draft-js';
+// import 'draft-js/dist/Draft.css';
 
 const HeroSection = () => {
-    const [editorState, setEditorState] = React.useState(
-        () => EditorState.createEmpty(),
-    );
+    // const [editorState, setEditorState] = React.useState(
+    //     () => EditorState.createEmpty(),
+    // );
     return (
         <>
             {/* <div class="grid grid-cols-12 gap-8">
