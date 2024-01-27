@@ -1,4 +1,5 @@
 // pages/lyrics.js
+import { publicAxios } from '@/services/axios';
 import axios from 'axios';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -86,7 +87,7 @@ const LyricsPage = () => {
 
 
 export async function getStaticPaths() {
-    const res = await axios.post('http://localhost:8080/api/lyrics/getAll')
+    const res = await publicAxios.post('/lyrics/getAll')
     const data = res?.data?.data
     const paths = data.map(item => {
         return { params: { lyrics: item?.slug } }
@@ -100,7 +101,7 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
     console.log(params)
-    const res = await axios.post('http://localhost:8080/api/lyrics/getAll', { slug: params.lyrics })
+    const res = await publicAxios.post('/lyrics/getAll', { slug: params.lyrics })
     console.log(res.data?.data)
     const data = res?.data?.data
     return { props: { data } }
