@@ -8,12 +8,11 @@ import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
 import CountDownTimer from './CountdownTimer';
-import { useDispatch, useSelector } from 'react-redux';
-import { setUser, setToken } from '@/redux/authSlice'
 import { isEmpty } from '@/utility/Utils';
-import { axios2 } from '@/services/axios';
+import { axios2, publicAxios } from '@/services/axios';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import useAuth from "@/hooks/useAuth";
 
 
 const schema = yup
@@ -22,15 +21,14 @@ const schema = yup
   }).required()
 
 
-const LenderLogin = () => {
+const UserLogin = () => {
   const [isHideOTP, setIsHideOTP] = useState(true)
   const [errorOtp, setErrorOtp] = useState(false)
   const [mobileNumber, setMobileNumber] = useState("")
   const [OTP, setOTP] = useState("")
   const [isResend, setIsResend] = useState(true)
-  const dispatch = useDispatch()
-  const navigate = useRouter()
-  const { user, token } = useSelector(st => st.auth)
+  const router = useRouter()
+  const { user, token, saveUser } = useAuth()
 
 
   const {
@@ -50,9 +48,9 @@ const LenderLogin = () => {
   const submitMobileNumber = async (data) => {
     setMobileNumber(data.phoneNumber)
 
-    const response = axios2.post('/admin/admin-login', {
-      "phone_number": data.phoneNumber,
-      mode: "COMPARIFY"
+    const response = publicAxios.post('/login', {
+      "mobileNumber": data.phoneNumber,
+      "fullName": "Akash Masih"
     })
 
     toast.promise(response, {
@@ -68,20 +66,15 @@ const LenderLogin = () => {
 
   const submitOTP = (e) => {
     e.preventDefault()
-    const response = axios2.post('/admin/verify', {
-      "phone_number": String(mobileNumber),
-      "otp": OTP,
-      mode: "COMPARIFY"
-
+    const response = publicAxios.post('/verify-otp', {
+      "mobileNumber": mobileNumber,
+      "OTP": OTP
     })
 
     toast.promise(response, {
       loading: 'Verifying OTP...',
-      success: (data) => {
-        const userData = data?.data?.data
-        console.log(data)
-        dispatch(setUser(userData?.user))
-        dispatch(setToken(userData?.token))
+      success: (res) => {
+        saveUser(res?.data?.data)
         return "You are Successfully Login"
       },
       error: "Please Enter Valid OTP"
@@ -91,73 +84,63 @@ const LenderLogin = () => {
 
   const resendOTP = () => {
     setIsResend(true)
-    submitMobileNumber()
+    submitMobileNumber({ phoneNumber: mobileNumber })
   }
 
 
 
   return (
-    <>
-      <div className="rounded-sm border md:mt-20 mt-0 md:py-20 py-5 border-stroke bg-white   dark:border-strokedark dark:bg-boxdark">
-        <div className="flex flex-wrap md:h-full container w-full  justify-between items-center">
-          <div className="hidden w-full xl:block xl:w-1/2">
-            <div className="py-17.5 inline-block text-center">
-              <h2 className="mb-6">Lenders Login</h2>
-              <p className="mb-10">
-                Loan Marketplace for Industry Professionals
-              </p>
-              <span className="mt-15 ">
-                <img src="/images/loans/home/third.svg" alt="Logo" />
-              </span>
-            </div>
-          </div>
+    <section className="bg-gray-50 dark:bg-gray-900">
+      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+        <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+          <img className="w-8 h-8 mr-2" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg" alt="logo" />
+          Flowbite
+        </a>
+        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+              Sign in to your account
+            </h1>
+            <form onSubmit={isHideOTP ? handleSubmit(submitMobileNumber) : submitOTP}>
+              <InputField readOnly={!isHideOTP} register={register("phoneNumber")} error={errors.phoneNumber} label="Mobile Number" placeholder="Enter your phone number" icon={<MdOutlinePhoneEnabled size="24px" />} />
+              {
+                !isHideOTP &&
+                <OTPInput label="Enter 4 Digit Code" length={4} onInputChange={handleOTPChange} error={true} />
+              }
+              <div className="mb-5 mt-10">
+                <Button disabled={isHideOTP ? watch("phoneNumber") && watch("phoneNumber").length === 10 ? false : true : OTP.length === 4 ? false : true} type="submit">{isHideOTP ? 'Generate OTP' : 'Submit OTP'} </Button>
+              </div>
+              {
+                !isHideOTP &&
 
-          <div className="w-full border-stroke md:pl-20 pl-0 dark:border-strokedark xl:w-1/2 xl:border-l-2">
-            <div className="w-full mt-10 md:mt-0 p-0 md:p-17.5">
-              {/* <span className="mb-1.5 block font-medium">Start for free</span> */}
-              <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
-                Login In to Comparify
-              </h2>
-
-              <form onSubmit={isHideOTP ? handleSubmit(submitMobileNumber) : submitOTP}>
-                <InputField readOnly={!isHideOTP} register={register("phoneNumber")} error={errors.phoneNumber} label="Mobile Number" placeholder="Enter your phone number" icon={<MdOutlinePhoneEnabled size="24px" />} />
-                {
-                  !isHideOTP &&
-                  <OTPInput label="Enter Six Digit Code" length={6} onInputChange={handleOTPChange} error={true} />
-                }
-                <div className="mb-5 mt-10">
-                  <Button disabled={isHideOTP ? watch("phoneNumber") && watch("phoneNumber").length === 10 ? false : true : OTP.length === 6 ? false : true} type="submit">{isHideOTP ? 'Generate OTP' : 'Submit OTP'} </Button>
+                < div className="mt-6 text-center">
+                  {
+                    isResend ?
+                      <p onClick={resendOTP}>
+                        Resend OTP in {" "}
+                        <span className='text-primary'>
+                          <CountDownTimer
+                            callback={() => {
+                              setIsResend(false);
+                            }}
+                          />
+                        </span>
+                      </p>
+                      :
+                      <p className='text-primary underline cursor-pointer' onClick={resendOTP}>
+                        Resend OTP
+                      </p>
+                  }
                 </div>
-                {
-                  !isHideOTP &&
-
-                  < div className="mt-6 text-center">
-                    {
-                      isResend ?
-                        <p onClick={resendOTP}>
-                          Resend OTP in {" "}
-                          <span className='text-primary'>
-                            <CountDownTimer
-                              callback={() => {
-                                setIsResend(false);
-                              }}
-                            />
-                          </span>
-                        </p>
-                        :
-                        <p className='text-primary underline cursor-pointer' onClick={resendOTP}>
-                          Resend OTP
-                        </p>
-                    }
-                  </div>
-                }
-              </form>
-            </div>
+              }
+            </form>
           </div>
-        </div >
-      </div >
-    </>
+        </div>
+      </div>
+    </section>
   );
 };
 
-export default LenderLogin;
+export default UserLogin
+
+

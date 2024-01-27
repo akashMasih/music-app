@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-const defaultTheme = require('tailwindcss/defaultTheme')
+const colors = require('tailwindcss/colors')
 module.exports = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -49,15 +49,11 @@ module.exports = {
       success: '#219653',
       danger: '#D34053',
       warning: '#FFA70B',
-    },
-    screens: {
-      '2xsm': '375px',
-      xsm: '425px',
-      '3xl': '2000px',
-      ...defaultTheme.screens,
+      ...colors
     },
     extend: {
       fontSize: {
+        'title-2xxl': ['100px', '1.4'],
         'title-xxl': ['44px', '55px'],
         'title-xl': ['36px', '45px'],
         'title-xl2': ['33px', '45px'],

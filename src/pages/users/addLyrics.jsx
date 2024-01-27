@@ -1,4 +1,5 @@
 import LyricsForm from "@/components/users/LyricsForm";
+import withAuth from "@/hooks/withAuth";
 
 const AddLyrics = () => {
     return (
@@ -6,4 +7,4 @@ const AddLyrics = () => {
     )
 }
 
-export default AddLyrics;
+export default withAuth(AddLyrics, ["1"]);

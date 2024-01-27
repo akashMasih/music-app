@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { USER } from '@/hooks/useAuth'
+import { isEmpty } from '@/utility/Utils';
 // const token = window ? localStorage.getItem("token") ?  : "" : ""
 const protectedInterceptor = axios.create({
   baseURL: `http://13.200.180.109:4000/api`,
@@ -8,12 +10,15 @@ const protectedInterceptor = axios.create({
 protectedInterceptor.interceptors.request.use(
   (config) => {
     // Modify the request config here (add headers, authentication tokens)
-    const accessToken = localStorage.getItem("token")
+    let accessToken = localStorage.getItem(USER)
 
-
+    if (isEmpty(accessToken)) {
+      return false
+    }
+    accessToken = JSON.parse(accessToken)
     // If token is present add it to request's Authorization Header
     if (accessToken) {
-      if (config.headers) config.headers.authorization = accessToken;
+      if (config.headers) config.headers.authorization = accessToken?.token;
     }
     else {
       // localStorage.clear()
@@ -41,7 +46,7 @@ protectedInterceptor.interceptors.response.use(
     // Handle response errors here
 
     if (error?.response?.status === 403) {
-      localStorage.clear()
+      localStorage.removeItem(USER)
       window.location.reload()
     }
     else {

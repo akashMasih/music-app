@@ -59,8 +59,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
   const crmRoutes = [
     // { title: "Dashboard", route: '/', icon: <RxDashboard size="22px" /> },
-    { title: "Dashboard", route: '/user/dashboard', icon: <MdInsertChartOutlined size="26px" /> },
-    { title: "Add New Lyrics", route: '/user/addLyrics', icon: <MdOutlineLyrics size="26px" /> },
+    { title: "Dashboard", route: '/users/dashboard', icon: <MdInsertChartOutlined size="26px" /> },
+    { title: "Add New Lyrics", route: '/users/addLyrics', icon: <MdOutlineLyrics size="26px" /> },
     // { title: "Add Leads", route: '/add-lead', icon: <MdPersonAddAlt size="24px" /> },
   ]
 

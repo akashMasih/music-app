@@ -7,8 +7,7 @@ import useAuth from '@/hooks/useAuth';
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { user } = useAuth()
-  console.log(user)
+  const { user, logout } = useAuth()
   const trigger = useRef(null);
   const dropdown = useRef(null);
 
@@ -38,7 +37,7 @@ const DropdownUser = () => {
     return () => document.removeEventListener('keydown', keyHandler);
   });
 
-
+  console.log(user)
 
   return (
     <div className="relative">
@@ -49,13 +48,9 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            {user?.poc_name}
+            {user?.fullName}
           </span>
-          <span className="block text-xs">{user?.lender_name}</span>
-        </span>
-
-        <span className="h-8">
-          <img src={`https://admin1.arambh.co/bankIcons/${user?.icon}`} alt="User" className='h-8' />
+          <span className="block text-xs">{user?.roleName}</span>
         </span>
 
         <svg
@@ -84,19 +79,7 @@ const DropdownUser = () => {
         className={`absolute text-body right-0 mt-5 flex w-[12rem] flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark ${dropdownOpen === true ? 'block' : 'hidden'
           }`}
       >
-        <ul className="flex flex-col border-b border-stroke px-6 py-7.5 dark:border-strokedark">
-          <li className='my-4'>
-            <Link
-              href="/profile"
-              className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
-            >
-              <IoPersonOutline size="24px" />
-              My Profile
-            </Link>
-          </li>
-
-        </ul>
-        <button onClick={() => null} className="flex items-center gap-3.5 py-4 px-6 text-sm font-medium duration-300 ease-in-out hover:text-primary text-body lg:text-base">
+        <button onClick={() => logout()} className="flex items-center gap-3.5 py-4 px-6 text-sm font-medium duration-300 ease-in-out hover:text-primary text-body lg:text-base">
           <RiLogoutBoxLine size="24px" />
           Log Out
         </button>
