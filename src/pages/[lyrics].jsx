@@ -1,110 +1,143 @@
 // pages/lyrics.js
 import { publicAxios } from '@/services/axios';
+import { isEmpty, isEmptyArray } from '@/utility/Utils';
 import axios from 'axios';
+import moment from 'moment';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { FiEye, FiHeart } from 'react-icons/fi';
 
-const LyricsPage = () => {
+const LyricsPage = ({ data }) => {
     const router = useRouter()
+    console.log(data)
+    const lyricsData = data && !isEmptyArray(data) && data[0]
     // Dummy data (replace with your actual data)
-    const title = "Song Title";
-    const artist = "Artist Name";
-    const songNote = "A note about the song";
-    const bpm = "120 BPM";
-    const tags = ["Pop", "Love", "Melody"];
-    const coverImage = "/path/to/cover-image.jpg";
-    const lyricsContent = "<p>This is the lyrics content.</p>";
+    const title = lyricsData?.title
+    const artist = lyricsData.artists
+    const songDescription = !isEmpty(lyricsData?.metaDescription) ? lyricsData?.metaDescription : title
+    const bpm = "";
+    const tags = [lyricsData?.title, ...lyricsData?.tags, "Bible Notes", "Masih Songs", "Christian Song Lyric", "Lyrics"]
     const canonicalBaseURL = "https://www.biblenotes.in"
+    const coverImage = `${canonicalBaseURL}/single-logo.png`
+    const lyricsContent = lyricsData?.lyrics
+    const languages = isEmptyArray(lyricsData?.languages) ? lyricsData?.languages : ["Hindi,English"]
+
     const currentPath = router.asPath;
 
-    const readCount = 1000;
-    const favoriteCount = 500;
+    const readCount = lyricsData?.readCount === 0 ? 1000 : lyricsData?.readCount;
+    const favoriteCount = lyricsData?.favoriteCount === 0 ? 1000 : lyricsData?.favoriteCount;
 
     const canonicalPageUrl = `${canonicalBaseURL}${currentPath}`
 
     return (
         <>
             <Head>
-                <title>{`${title} by ${artist}`}</title>
-                <meta name="description" content={songNote} />
+                <title>{title}</title>
+                <meta name="description" content={songDescription} />
                 <meta name="keywords" content={tags.join(', ')} />
-                <meta name="author" content={artist} />
                 <meta name="robots" content="index, follow" />
                 <link rel="canonical" href={canonicalPageUrl} />
-                <meta property="og:title" content={`${title} by ${artist}`} />
-                <meta property="og:description" content={songNote} />
+                <meta property="og:title" content={`${title}`} />
+                <meta property="og:description" content={songDescription} />
                 <meta property="og:image" content={coverImage} />
                 <meta property="og:type" content="website" />
                 <meta property="twitter:card" content="summary_large_image" />
-                <meta property="twitter:title" content={`${title} by ${artist}`} />
-                <meta property="twitter:description" content={songNote} />
+                <meta property="twitter:title" content={title} />
+                <meta property="twitter:description" content={songDescription} />
                 <meta property="twitter:image" content={coverImage} />
+                <meta content="Bible Notes" property="og:site_name" />
+                <meta name="languages" content={languages.join(', ')} />
+                <meta name="publisher" content="Bible Notes" />
+                <meta name="author" content={lyricsData?.postedBy?.name} />
 
+                <script type="application/ld+json">
+                    {`
+            {
+              "@context": "http://schema.org",
+              "@type": "Lyrics",
+              "name": "${title}",
+              "byArtist": "${artist[0].name}",
+              "datePublished": "${moment(lyricsData?.createdAt).format('ll')}",
+              "description": "${songDescription}",
+              "image": "${coverImage}",
+              "url": "${canonicalPageUrl}",
+              "isFamilyFriendly": true
+            }
+          `}
+                </script>
 
             </Head>
 
-            <div>
-                {/* Lyrics Content */}
-                <div className="mb-8">
-                    <h1 className="text-4xl font-bold mb-4">{title}</h1>
-                    <h2 className="text-2xl text-gray-600 mb-4">{artist}</h2>
-                    <p className="text-lg mb-4">{songNote}</p>
-                    <div className="flex items-center mb-4">
-                        <span className="mr-4">{bpm}</span>
-                        {tags.map((tag) => (
-                            <span key={tag} className="bg-gray-200 text-gray-600 rounded-full px-3 py-1 text-sm mr-2">
-                                {tag}
-                            </span>
-                        ))}
-                    </div>
-                    <img src={coverImage} alt="Cover Image" className="w-full mb-4" />
-                    <div dangerouslySetInnerHTML={{ __html: lyricsContent }} />
+            <main className="pt-8 pb-16 lg:pt-16 lg:pb-24 bg-white dark:bg-gray-900 antialiased">
+                <div className="flex justify-between px-4 mx-auto max-w-screen-xl ">
+                    <article className="mx-auto w-full max-w-2xl format format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
+                        <header className="mb-4 lg:mb-6 not-format">
+                            <address className="flex items-center mb-6 not-italic">
+                                <div className="inline-flex items-center gap-4 mr-3 text-sm text-gray-900 dark:text-white">
+                                    <div className='h-20 hidden md:flex w-24.5 bg-gray-50 rounded-full  justify-center items-center'>
+                                        <img src="/single-logo.png" alt="bible notes" className='w-10' />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{lyricsData?.title}</h2>
+                                        {
+                                            !isEmptyArray(artist) && artist.map((item, index) => (
+                                                <p key={index} className="text-base text-gray-500 dark:text-gray-400">
+                                                    {item?.artType}: <span className='text-graydark'>{item?.name}</span>
+                                                </p>
+                                            ))
+                                        }
+                                        <p className="text-base text-gray-500 dark:text-gray-400">
+                                            <time dateTime={moment(lyricsData?.createdAt).format('ll')} title={moment(lyricsData?.createdAt).format('ll')}>{moment(lyricsData?.createdAt).format('ll')}</time>
+                                        </p>
+                                        <p className="text-base text-gray-500 dark:text-gray-400">
+                                            {`Posted by ${lyricsData?.postedBy?.name} (${lyricsData?.postedBy?.role_name})`}
+                                        </p>
+                                    </div>
+                                </div>
+                            </address>
+                            <h1 className="mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white">{lyricsData?.title}</h1>
+                        </header>
+                        <div className='mt-10 text-gray-700' dangerouslySetInnerHTML={{ __html: lyricsContent }} />
+                    </article>
                 </div>
+            </main>
 
-                {/* Additional Information */}
-                <div className="flex justify-between items-center">
-                    <div>
-                        <span className="mr-4 flex items-center">
-                            <FiEye className="mr-2" /> {readCount}
-                        </span>
-                        <span className="flex items-center">
-                            <FiHeart className="mr-2" /> {favoriteCount}
-                        </span>
-                    </div>
-                    <div className="flex items-center">
-                        {tags.map((tag) => (
-                            <span key={tag} className="bg-gray-200 text-gray-600 rounded-full px-3 py-1 text-sm mr-2">
-                                {tag}
-                            </span>
-                        ))}
-                    </div>
-                </div>
-            </div >
         </>
+
     );
 }
 
 
 export async function getStaticPaths() {
-    const res = await publicAxios.post('/lyrics/getAll')
-    const data = res?.data?.data
-    const paths = data.map(item => {
-        return { params: { lyrics: item?.slug } }
-    })
+    try {
+        const res = await publicAxios.post('/lyrics/getAll')
+        const data = res?.data?.data
+        const paths = data.map(item => {
+            return { params: { lyrics: item?.slug } }
+        })
 
-    return {
-        paths: paths,
-        fallback: false,
+        return {
+            paths: paths,
+            fallback: false,
+        }
+    }
+    catch (e) {
+        console.log("Unable to create Path")
     }
 }
 
+
+
 export async function getStaticProps({ params }) {
-    console.log(params)
-    const res = await publicAxios.post('/lyrics/getAll', { slug: params.lyrics })
-    console.log(res.data?.data)
-    const data = res?.data?.data
-    return { props: { data } }
+    try {
+        const res = await publicAxios.post('/lyrics/getAll', { slug: params.lyrics })
+        console.log(res.data?.data)
+        const data = res?.data?.data
+        return { props: { data } }
+    }
+    catch (e) {
+        console.log("Unable to get Song")
+    }
 }
 
 

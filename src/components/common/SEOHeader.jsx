@@ -12,7 +12,7 @@ function SEOHeader(
     }
 ) {
     const router = useRouter()
-    const canonicalBaseURL = process.env.NEXT_PUBLIC_DOMAIN_URL
+    const canonicalBaseURL = router.basePath
     const currentPath = router.asPath;
     const canonicalPageUrl = `${canonicalBaseURL}${currentPath}`
     const coverImageURl = `${canonicalBaseURL}${coverImage}`
