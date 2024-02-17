@@ -3,7 +3,7 @@ import { USER } from '@/hooks/useAuth'
 import { isEmpty } from '@/utility/Utils';
 // const token = window ? localStorage.getItem("token") ?  : "" : ""
 const protectedInterceptor = axios.create({
-  baseURL: `http://13.200.180.109:4000/api`,
+  baseURL: `http://13.233.241.30/api`,
 });
 
 // Request interceptor
