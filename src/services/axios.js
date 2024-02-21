@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { USER } from '@/hooks/useAuth'
 import { isEmpty } from '@/utility/Utils';
-// const token = window ? localStorage.getItem("token") ?  : "" : ""
+const baseURL = `https://api.biblenotes.in/api`
 const protectedInterceptor = axios.create({
-  baseURL: `http://api.biblenotes.in/api`,
+  baseURL: baseURL,
 });
 
 // Request interceptor
@@ -59,7 +59,7 @@ protectedInterceptor.interceptors.response.use(
 
 const publicInterceptor = axios.create({
   // baseURL: `${process.env.NEXT_PUBLIC_API_SERVER}/api`,
-  baseURL: `http://13.200.180.109:4000/api`,
+  baseURL: baseURL,
 
 });
 
